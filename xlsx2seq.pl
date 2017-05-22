@@ -202,22 +202,22 @@ $count = $importer2->each(sub {
         if (length $country == 2) {$country .= '-'};
         unless (length $country == 3) {$country = 'xx-'};
 
-        #Verarbeitung Zeitangaben für Feld 260c: Falls in Tabelle ausgefüllt, unverändert übernehmen, falls nicht, Wert aus Feld 593 kopieren
+        #Verarbeitung Zeitangaben für Feld 260c: Falls in Tabelle ausgefüllt, unverändert übernehmen, falls nicht, Wert aus Feld 046 kopieren
         unless ($hash{'260c'}) {
-            $hash{'260c'} = $hash{'593a1'}
+            $hash{'260c'} = $hash{'046'}
         }
 
         #Verarbeitung der Zeitangaben aus Feld 593 für Codierung in Feld 008: Auslesen des Startjahrs sowie des Endjahres, falls ein Bindestrich vorhanden ist. Ansonsten wird das Endjahr auf '----' gesetzt
         #Falls Bindestrich vorhanden ist, wird die Zeitangabe in Feld 008 mit 'm' codiert, ansonsten mit 's' 
-        my $startyear = substr $hash{'593a1'}, 0, 4;
+        my $startyear = substr $hash{'046'}, 0, 4;
         my $endyear;
         my $timerange;
-        my $strich = (index ($hash{'593a1'}, "-")) + 1;
+        my $strich = (index ($hash{'046'}, "-")) + 1;
         if ($strich eq 0) {
             $endyear = "----";
             $timerange = 's';
         } else {
-            $endyear = substr $hash{'593a1'}, $strich, 4; 	
+            $endyear = substr $hash{'046'}, $strich, 4; 	
             $timerange = 'm';
         }
 
