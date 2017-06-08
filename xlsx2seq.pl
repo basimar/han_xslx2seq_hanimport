@@ -10,6 +10,7 @@ die "Argumente: $0 Input-Dokument (xlsx), Output-Dokument, Systemnummerbeginn, \
 use utf8;
 # Unicode-Support für Output
 binmode STDOUT, ":utf8";
+use Unicode::Normalize;
 
 # Catmandu-Module
 use Catmandu::Importer::XLSX;
@@ -51,13 +52,10 @@ my $count = $importer1->each(sub {
         $sysnum = sprintf("%-9.9d", $sysnum);
         #Schreibt Systemnummerpärchen (alt/neu) in %sysnum
        	$sysnum{$hash{'sys'}} = $sysnum;
-        print $hash{'sys'}, "\n", $sysnum{$hash{'sys'}}, "\n\n";
         #erhöht neue Systemnummer um 1
         $sysnum = $sysnum + 1;
     };
 });
-
-print Dumper(%sysnum);
 
 #Sprachhash für Zuordnung Sprachkürzel und ausgeschriebene Form
 my %language = (
@@ -155,8 +153,11 @@ $count = $importer2->each(sub {
         }
     }
 
-    #Ersetzt falsche Apostrophe und Anführungszeichen
+    #Ersetzt falsche Apostrophe und Anführungszeichen; fügt decomposed Unicode-Zeichen (a+" anstelle ä) zusammen.
     for my $value (values %hash) {
+
+        $value = NFC($value);
+
         $value =~ s/&apos;/\'/g;
         $value =~ s/‘/\'/g;
         $value =~ s/’/\'/g;
@@ -173,27 +174,27 @@ $count = $importer2->each(sub {
     #Prüft ob in der entsprechenden Excel-Zeile wirklich Daten vorhanden sind, sonst wird die Verarbeitung abgebrochen
     if (($hash{'data'} ne 'n') && $hash{'sys'}) { 
 
-    #Verarbeitung Materialtyp für LDR: Wenn Materialtyp nicht die Länge 1 hat, wird er auf '-' gesetzt.
-    my $mattype = $hash{'LDR1'};
-    unless (length $mattype == 1) {$mattype = '-'};
-
-    #Verarbeitung Länder und Sprachcodes in Feld 008 und 546
-    #Lädt Sprachcodes in eine Array ein (getrennt durch Komma+Spatium, erstes Arrayelement wird für Feld 008 verwendet
-    my @languages = split(', ', $hash{'0081'});
-    my $language = $languages[0];
+        #Verarbeitung Materialtyp für LDR: Wenn Materialtyp nicht die Länge 1 hat, wird er auf '-' gesetzt.
+        my $mattype = $hash{'LDR1'};
+        unless (length $mattype == 1) {$mattype = '-'};
+    
+        #Verarbeitung Länder und Sprachcodes in Feld 008 und 546
+        #Lädt Sprachcodes in eine Array ein (getrennt durch Komma+Spatium, erstes Arrayelement wird für Feld 008 verwendet
+        my @languages = split(', ', $hash{'0081'});
+        my $language = $languages[0];
 	   	
-    #Falls Sprachcode nicht Länge 3 hat, wird er auf 'und' gesetzt
-    unless (length $language == 3) {$language = 'und'}; 
-		
-    #Geht die Liste der Sprachcodes durch, prüft ob die Codes im Sprachhash vorkommen und verkettet die ausführliche Form in der Variable $languange_long		
-    my $language_long;
-
-    foreach my $lang (@languages) {
-	if (exists($language{$lang})) {$language_long .= $language{$lang} . ', '};
-    };
-    $language_long =~ s/, ^//g;
- 		
-    #Wenn nur eine Sprache vorkommt wird lang_041 auf undefiniert gesetzt, damit Feld 041 nicht vergeben wird.
+        #Falls Sprachcode nicht Länge 3 hat, wird er auf 'und' gesetzt
+        unless (length $language == 3) {$language = 'und'}; 
+		    
+        #Geht die Liste der Sprachcodes durch, prüft ob die Codes im Sprachhash vorkommen und verkettet die ausführliche Form in der Variable $languange_long		
+        my $language_long;
+    
+        foreach my $lang (@languages) {
+	    if (exists($language{$lang})) {$language_long .= $language{$lang} . ', '};
+        };
+        $language_long =~ s/, $//g;
+ 		    
+        #Wenn nur eine Sprache vorkommt wird lang_041 auf undefiniert gesetzt, damit Feld 041 nicht vergeben wird.
 	my $lang_041;
         if (@languages > 1) {$lang_041 = $languages[0]};
 
@@ -210,19 +211,22 @@ $count = $importer2->each(sub {
         #Verarbeitung der Zeitangaben aus Feld 593 für Codierung in Feld 008: Auslesen des Startjahrs sowie des Endjahres, falls ein Bindestrich vorhanden ist. Ansonsten wird das Endjahr auf '----' gesetzt
         #Falls Bindestrich vorhanden ist, wird die Zeitangabe in Feld 008 mit 'm' codiert, ansonsten mit 's' 
         my $startyear = substr $hash{'046'}, 0, 4;
-        my $endyear;
+        my $endyear008;
+        my $endyear046;
         my $timerange;
         my $strich = (index ($hash{'046'}, "-")) + 1;
         if ($strich eq 0) {
-            $endyear = "----";
+            $endyear008 = "----";
             $timerange = 's';
         } else {
-            $endyear = substr $hash{'046'}, $strich, 4; 	
+            $endyear008 = substr $hash{'046'}, $strich, 4; 	
+            $endyear046 = substr $hash{'046'}, $strich, 4; 	
             $timerange = 'm';
         }
 
         $startyear = '----' unless length $startyear == 4;
-        $endyear = '----' unless length $endyear == 4;
+        $endyear008 = '----' unless length $endyear008 == 4;
+        $endyear046 = '' unless length $endyear046 == 4;
 
 
         #Verarbeitung Feld 520a1: Hinzufügen von 'Enthält'
@@ -306,9 +310,9 @@ $count = $importer2->each(sub {
        	    record => [
                 ['FMT',' ',' ','',$hash{'FMT'}],
                 ['LDR',' ',' ','','-----n' . $mattype . 'm--22-----4u-4500'],
-                ['008',' ',' ','', $date008 . $timerange . $startyear . $endyear . $country . '-----------------' . $language . '--'],
+                ['008',' ',' ','', $date008 . $timerange . $startyear . $endyear008 . $country . '-----------------' . $language . '--'],
                 ['041',' ',' ','a',$lang_041,'a', $languages[1],'a',$languages[2],'a',$languages[3],'a',$languages[4],'a',$languages[5],'a', $languages[6],'a',$languages[7],'a',$languages[8],'a', $languages[9],'a',$languages[10]],
-                ['046',' ',' ','a',$timerange,'c', $startyear, 'e', $endyear],
+                ['046',' ',' ','a',$timerange,'c', $startyear, 'e', $endyear046],
                 ['245',' ',' ','a',$hash{'245a'},'b',$hash{'245b'},'c',$hash{'245c'},'h', $hash{'245h'}],
                 ['250',' ',' ','a',$hash{'250a'}],	
                 ['260',' ',' ','a',$hash{'260a'},'c',$hash{'260c'}],
