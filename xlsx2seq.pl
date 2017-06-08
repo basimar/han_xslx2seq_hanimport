@@ -159,7 +159,14 @@ $count = $importer2->each(sub {
         $value = NFC($value);
 
         $value =~ s/&apos;/\'/g;
+        $value =~ s/’/\'/g;
+        $value =~ s/ʼ/\'/g;
+        $value =~ s/ˈ/\'/g;
+        $value =~ s/´/\'/g;
+        $value =~ s/`/\'/g;
         $value =~ s/‘/\'/g;
+        $value =~ s/′/\'/g;
+        $value =~ s/ʻ/\'/g;
         $value =~ s/’/\'/g;
         $value =~ s/”/\"/g;
         $value =~ s/„/\"/g;
