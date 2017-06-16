@@ -352,6 +352,7 @@ $count = $importer2->each(sub {
                 ['907',' ',' ',$ind907,$hash{'907'}],
                 ['907',' ',' ',$ind9071,$hash{'9071'}],
                 ['907',' ',' ',$ind9072,$hash{'9072'}],
+                ['909',' ',' ','f','collect_this archivgut'],
      	    ],
         };
     #Lädt Hash in Exporter
