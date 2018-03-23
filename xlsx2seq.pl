@@ -210,13 +210,13 @@ $count = $importer2->each(sub {
         if (length $country == 2) {$country .= '-'};
         unless (length $country == 3) {$country = 'xx-'};
 
-        #Verarbeitung Zeitangaben für Feld 260c: Falls in Tabelle ausgefüllt, unverändert übernehmen, falls nicht, Wert aus Feld 046 kopieren
-        unless ($hash{'260c'}) {
-            $hash{'260c'} = $hash{'046'}
+        #Verarbeitung Zeitangaben für Feld 264c: Falls in Tabelle ausgefüllt, unverändert übernehmen, falls nicht, Wert aus Feld 046 kopieren
+        unless ($hash{'264c'}) {
+            $hash{'264c'} = $hash{'046'}
         }
 
-        #Verarbeitung der Zeitangaben aus Feld 593 für Codierung in Feld 008: Auslesen des Startjahrs sowie des Endjahres, falls ein Bindestrich vorhanden ist. Ansonsten wird das Endjahr auf '----' gesetzt
-        #Falls Bindestrich vorhanden ist, wird die Zeitangabe in Feld 008 mit 'm' codiert, ansonsten mit 's' 
+        #Verarbeitung der Zeitangaben aus Feld 040 für Codierung in Feld 008: Auslesen des Startjahrs sowie des Endjahres, falls ein Bindestrich vorhanden ist. Ansonsten wird das Endjahr auf '----' gesetzt
+        #Falls Bindestrich vorhanden ist, wird die Zeitangabe in Feld 008 mit 'm' codiert, ansonsten mit 's'. Falls in Feld 264$c ein Ca. oder ca. vorkommt, wird mit 'q' codiert.
         my $startyear = substr $hash{'046'}, 0, 4;
         my $endyear008;
         my $endyear046;
@@ -228,7 +228,11 @@ $count = $importer2->each(sub {
         } else {
             $endyear008 = substr $hash{'046'}, $strich, 4; 	
             $endyear046 = substr $hash{'046'}, $strich, 4; 	
-            $timerange = 'm';
+            unless ($hash{'264c'} =~ /(C|c)a\./ ) {
+                $timerange = 'm';
+            } else {
+                $timerange = 'q';
+            }
         }
 
         $startyear = '----' unless length $startyear == 4;
@@ -322,7 +326,7 @@ $count = $importer2->each(sub {
                 ['046',' ',' ','a',$timerange,'c', $startyear, 'e', $endyear046],
                 ['245',' ',' ','a',$hash{'245a'},'b',$hash{'245b'},'c',$hash{'245c'},'h', $hash{'245h'}],
                 ['250',' ',' ','a',$hash{'250a'}],	
-                ['260',' ',' ','a',$hash{'260a'},'c',$hash{'260c'}],
+                ['264',' ','0','a',$hash{'264a'},'c',$hash{'264c'}],
                 ['300',' ',' ','a',$hash{'300a'},'b',$hash{'300b'},'c',$hash{'300c'}, 'e', $hash{'300e'} ],
                 ['340',' ',' ','a',$hash{'340a'}],
                 ['351',' ',' ','c',$hash{'351c'}],
@@ -339,7 +343,7 @@ $count = $importer2->each(sub {
                 ['520',' ',' ','a',$hash{'520a1'}],
                 ['520',' ',' ','a',$hash{'520a2'}],
                 ['533',' ',' ','n',$hash{'533n'}],
-                ['542',' ','1','l','CC0'],
+                ['542','1','1','l','CC0'],
                 ['544','1',' ','n',$hash{'5441n'}],
                 ['544','0',' ','n',$hash{'5440n'}],
                 ['534',' ',' ','n',$hash{'534n'}],
