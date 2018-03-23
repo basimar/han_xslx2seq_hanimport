@@ -324,7 +324,7 @@ $count = $importer2->each(sub {
                 ['008',' ',' ','', $date008 . $timerange . $startyear . $endyear008 . $country . '-----------------' . $language . '--'],
                 ['041',' ',' ','a',$lang_041,'a', $languages[1],'a',$languages[2],'a',$languages[3],'a',$languages[4],'a',$languages[5],'a', $languages[6],'a',$languages[7],'a',$languages[8],'a', $languages[9],'a',$languages[10]],
                 ['046',' ',' ','a',$timerange,'c', $startyear, 'e', $endyear046],
-                ['245',' ',' ','a',$hash{'245a'},'b',$hash{'245b'},'c',$hash{'245c'},'h', $hash{'245h'}],
+                ['245','1','0','a',$hash{'245a'},'b',$hash{'245b'},'c',$hash{'245c'},'h', $hash{'245h'}],
                 ['250',' ',' ','a',$hash{'250a'}],	
                 ['264',' ','0','a',$hash{'264a'},'c',$hash{'264c'}],
                 ['300',' ',' ','a',$hash{'300a'},'b',$hash{'300b'},'c',$hash{'300c'}, 'e', $hash{'300e'} ],
