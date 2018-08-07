@@ -24,6 +24,20 @@ Generierung der Systemnummern:
 Beim Ausführen des Skripts muss der Systemnummernbeginn als neunstellige Zahl definiert werden. Das Skript zählt dann für jede Zeile der Tabelle eine Systemnummer hoch.
 Um den Systemnummernbeginn zu wählen, bestimmt man die letzte vergebene Systemnummer (auf dem Aleph-Server mit dsv05 verbinden und util G/2 ausführen, last-doc-number) und fügt eine Sicherheitsmarge hinzu.
 
+Hochladen der Output Datei im Aleph-Sequential Format:
+Die Output-Datei kann anschliessend nach /exlibris/aleph/u22_1/dsv05/scratch hochgeladen und ohne weitere Bearbeitung mit dem Service p-load-18 in Aleph geladen werden. Dabei sind folgende Optionen zu wählen:
+
+Das Skript liefert Daten im Format Aleph Sequential. Diese Daten können dann 
+Aktuelle Datensätze ändern (bei der Option "Neue Datensätze hinzufügen" stimmen die hierarchischen Verknüpfungen nicht mehr!)
+Gesamten Satz ersetzen
+Vollständig Indexieren
+Fix/Merge-Routine: Keine
+Katalogisierer: p-load-18
+Bibliothek: DSV05
+
+Details zur Datenverarbeitung
+------------------------------------------------------------------------------------------------
+
 In Feld "490w" kann auf übergeordnete Aufnahmen verlinkt werden. Dazu gibt es zwei Möglichkeiten: Entweder gibt man dort die Aleph-Systemnummer einer bereits existierenden Katalogaufnahme ein oder man verlinkt auf eine andere Zeile der Tabelle. Für letzere Verlinkung kann die Dummy-Systemnummer verwendet werden, die in der Spalte "sys" abgespeichert wird. Das Skript ersetzt die Dummy-Systemnummern automatisch durch korrekte Systemnummern.
 
 Verarbeitung von Apostrophen und Anführungezeichen: 
@@ -62,15 +76,7 @@ In Feld 583$$b wird der Hinweis Verzeichnung=Description=Inventaire hingzugefüg
 Feld 909:
 In Feld 909$$f wird der Code "collect_this archivgut" hinzugefügt.
 
-Inport in Aleph
-------------------------------------------------------------------------------------------------
-Das Skript liefert Daten im Format Aleph Sequential. Diese Daten können dann ohne weitere Bearbeitung mit dem Service p-load-18 in Aleph geladen werden. Dabei sind folgende Optionen zu wählen:
-Aktuelle Datensätze ändern (bei der Option "Neue Datensätze hinzufügen" stimmen die hierarchischen Verknüpfungen nicht mehr!)
-Gesamten Satz ersetzen
-Vollständig Indexieren
-Fix/Merge-Routine: Keine
-Katalogisierer: p-load-18
-Bibliothek: DSV05
+
 
 
 
