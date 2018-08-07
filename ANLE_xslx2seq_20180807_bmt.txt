@@ -1,0 +1,77 @@
+Skript zum Import von Excel-Tabellen in Aleph
+---------------------------------------------------------------------------------------
+20180807 / bmt
+---------------------------------------------------------------------------------------
+
+Das Perl-Skript xlsx2seq.pl produziert aus Excel-Tabellen Marc-Daten im Format Aleph Sequential. Das Skript ist in der Programmiersprache Perl geschrieben und verwendet Code-Module des Catmandu-Projektes (http://librecat.org/).
+
+Input
+---------------------------------------------------------------------------------------
+Als Input verwendet das Skript eine Tabelle im xlsx-Format. Diese kann sowohl mit MS-Excel als auch Open/Libre Office Calc erstellt werden, wichtig ist, dass sie vor der Verarbeitung durch das Skript im richtigen Format abgespeichert wird.
+
+Aufbau der Tabelle: In der ersten Zeile befinden sich Spaltenüberschrift, anhand derer das Skript den Inhalt der Spalten erkennt. Diese Überschriften dürfen nicht modifiziert werden. Ist eine Spalte mit "n" beschriftet, so wird ihr Inhalt nicht ausgelesen. Die Reihenfolge der Spalten ist dem Skript egal und kann also modifiziert werden.
+
+Zeilen, die in der ersten Spalte ein "n" enthalten, werden vom Skript ignoriert. Dies verhindert, dass Zeilen das Zeilen mit Spaltenüberschriften, Titeln, Erläuterungen etc. ausgelesen werden.
+
+Verarbeitung durch das Skript
+----------------------------------------------------------------------------------------
+Ausführen des Skripts im Terminal:
+perl xlsx2seq.pl [Pfad zur Input-Datei] [Pfad zur Output-Datei] [Systemnummerbeginn]
+
+Damit das Skript läuft, müssen auf dem entsprechenden Rechner Perl sowie die benötigten Module installiert sein.
+
+Generierung der Systemnummern: 
+Beim Ausführen des Skripts muss der Systemnummernbeginn als neunstellige Zahl definiert werden. Das Skript zählt dann für jede Zeile der Tabelle eine Systemnummer hoch.
+Um den Systemnummernbeginn zu wählen, bestimmt man die letzte vergebene Systemnummer (auf dem Aleph-Server mit dsv05 verbinden und util G/2 ausführen, last-doc-number) und fügt eine Sicherheitsmarge hinzu.
+
+In Feld "490w" kann auf übergeordnete Aufnahmen verlinkt werden. Dazu gibt es zwei Möglichkeiten: Entweder gibt man dort die Aleph-Systemnummer einer bereits existierenden Katalogaufnahme ein oder man verlinkt auf eine andere Zeile der Tabelle. Für letzere Verlinkung kann die Dummy-Systemnummer verwendet werden, die in der Spalte "sys" abgespeichert wird. Das Skript ersetzt die Dummy-Systemnummern automatisch durch korrekte Systemnummern.
+
+Verarbeitung von Apostrophen und Anführungezeichen: 
+Typographisch korrekte Anführungszeichen und Apostrophe werden im Skript durch die im Aleph-Format vorgeschriebenen Ersatzzeichen ersetzt.
+
+Erstellen des Leaders: 
+Wenn der Materialtyp (Feld LDR1) nicht die Länge 1 hat, wird er durch "-" ersetzt.
+			 
+Erstellen von Feld 008
+Das aktuelle Datum wird als Erfassungsdatum in Feld 008 codiert.
+
+Angabe von Sprache und Erscheinungsort:
+Die Sprache kann in der Excel-Tabelle im Feld "0081" definiert werden. Die Sprachen müssen zwingend als gültige dreistellige Sprachcodes eingegeben werden, und durch Kommas und Spatien getrennt sein (z.B. "ger, eng, lat"). Besteht ein Sprachcode nicht aus drei Buchstaben, wird er durch "und" ersetzt. Der erste Sprachcode wird anschliessend in Feld 008 eingesetzt, falls es mehr als einen Sprachcode gibt, werden alle Sprachcodes auch in Feld 041 eingefügt (Feld 041 enthält maximal 11 Sprachcodes). Die natürlichsprachige Form der Sprachcodes wird anschliessend in Feld 546 eingefügt (das funktioniert nur bei den gebräuchlichsten Sprachcodes)
+
+Das Entstehungsland muss als zwei oder dreistelliger Ländercode in Spalte 0082 eingefügt werden. Bei zweistelligen Ländercodes wird ein "-" angefügt. Hat der Ländercode nicht zwei oder drei Buchstaben so wird er durch "xx-" ersetzt.
+
+Zeitangaben: 
+Ist Feld "264c" in der Tabelle nicht ausgefüllt, so wird der Wert aus Spalte "046" kopiert. Die normierten Zeitangaben müssen in Feld "046" eingegeben werden. Die ersten vier Zeichen werden als Startjahr in Feld 008 eingetragen (zudem wird die Zeitangabe in Feld 008 als "s" codiert). Kommt in Spalte 046 ein Bindestrich vor, so werden die vier Zeichen nach dem Bindstrich als Endjahr in Feld 008 eintragen (plus Codierung als "m").
+
+Präfixe:
+In folgende Feldern werden Präfixe vor den Zelleninhalt hinzugefügt:
+- Spalte "520a1": "Enthält: "
+- Spalte "520a2": "Darin: "
+- Spalte "500a1": "Archivalienart: "
+- Spalte "500a2": "Trägermaterial: "
+
+Verarbeitung Feld 906:
+Der Unterfeldcode von Feld 906 und 907 wird anhand des Inhalts dieses Feldes definiert. Z.B.: Spalte "906" enthält "PM" -> Indikator wird auf "d" gesetzt.
+
+Verarbeitung Signaturen:
+Signaturen in den Spalten "852d1" und "852d2" werden mit einem Spatium miteinander verknüpft
+
+Feld 583:
+In Feld 583$$b wird der Hinweis Verzeichnung=Description=Inventaire hingzugefügt, in Unterfeld c das aktuelle Datum und in Unterfeld i "Automatisiert nach HAN Import".
+
+Feld 909:
+In Feld 909$$f wird der Code "collect_this archivgut" hinzugefügt.
+
+Inport in Aleph
+------------------------------------------------------------------------------------------------
+Das Skript liefert Daten im Format Aleph Sequential. Diese Daten können dann ohne weitere Bearbeitung mit dem Service p-load-18 in Aleph geladen werden. Dabei sind folgende Optionen zu wählen:
+Aktuelle Datensätze ändern (bei der Option "Neue Datensätze hinzufügen" stimmen die hierarchischen Verknüpfungen nicht mehr!)
+Gesamten Satz ersetzen
+Vollständig Indexieren
+Fix/Merge-Routine: Keine
+Katalogisierer: p-load-18
+Bibliothek: DSV05
+
+
+
+
