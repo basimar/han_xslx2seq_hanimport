@@ -343,7 +343,7 @@ $count = $importer2->each(sub {
                 ['520',' ',' ','a',$hash{'520a1'}],
                 ['520',' ',' ','a',$hash{'520a2'}],
                 ['533',' ',' ','n',$hash{'533n'}],
-                ['542','1','1','l','CC0'],
+                ['542','1','1','l','Die Katalogdaten stehen unter der Lizenz CC0 zur Weiternutzung zur Verfügung.'],
                 ['544','1',' ','n',$hash{'5441n'}],
                 ['544','0',' ','n',$hash{'5440n'}],
                 ['534',' ',' ','n',$hash{'534n'}],
