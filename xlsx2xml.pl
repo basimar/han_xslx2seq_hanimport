@@ -316,14 +316,13 @@ $count = $importer2->each(sub {
         };
 
         #Generiert Data Hash
-	#Anpassung an Alma-Format: Feld 035 wird mit dummy-HAN-Systemnummer gefüllt, Rest der MARC-Felder müssen noch angepasst werden
+	#Anpassung an Alma-Format: Feld 035 wird mit Dummy-HAN-Systemnummer gefüllt, Rest der MARC-Felder müssen noch angepasst werden
         my $data = {
-		#_id => $sysnum{$hash{'sys'}},
        	    record => [
                 ['FMT',' ',' ','',$hash{'FMT'}],
                 ['LDR',' ',' ','','-----n' . $mattype . 'm--22-----4u-4500'],
                 ['008',' ',' ','', $date008 . $timerange . $startyear . $endyear008 . $country . '-----------------' . $language . '--'],
-                ['035',' ',' ','a','(HAN)' . $hash{'sys'} . 'DSV05'],	
+                ['035',' ',' ','a','(HAN)' . $sysnum{$hash{'sys'}} . 'DSV05'],	
                 ['041',' ',' ','a',$lang_041,'a', $languages[1],'a',$languages[2],'a',$languages[3],'a',$languages[4],'a',$languages[5],'a', $languages[6],'a',$languages[7],'a',$languages[8],'a', $languages[9],'a',$languages[10]],
                 ['046',' ',' ','a',$timerange,'c', $startyear, 'e', $endyear046],
                 ['245','1','0','a',$hash{'245a'},'b',$hash{'245b'},'c',$hash{'245c'},'h', $hash{'245h'}],
